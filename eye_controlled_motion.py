@@ -1,3 +1,6 @@
+#pip install opencv                         #Run the code in terminal which are comment out
+#pip install mediapipe
+#pip install pyautogui
 import cv2
 import mediapipe as mp
 import pyautogui
