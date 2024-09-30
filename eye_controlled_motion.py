@@ -10,6 +10,20 @@ cam = cv2.VideoCapture(0)
 face_mesh = mp.solutions.face_mesh.FaceMesh(refine_landmarks=True)
 screen_w, screen_h = pyautogui.size()
 
+def zoom_in():
+    pyautogui.hotkey('ctrl', '+')
+
+def zoom_out():
+    pyautogui.hotkey('ctrl', '-')
+
+def process_eye_zoom(eye_x, eye_y):
+    # Top-right corner for zoom in
+    if eye_x > screen_w * 0.75 and eye_y < screen_h * 0.25:
+        zoom_in()
+    # Bottom-left corner for zoom out
+    elif eye_x < screen_w * 0.25 and eye_y > screen_h * 0.75:
+        zoom_out()
+
 def eye():
     while True:
         _, frame = cam.read()
@@ -28,13 +42,25 @@ def eye():
                     screen_x = screen_w * landmark.x
                     screen_y = screen_h * landmark.y
                     pyautogui.moveTo(screen_x, screen_y)
+
+                    # Call zoom function based on eye position
+                    process_eye_zoom(screen_x, screen_y)
+                    
             left = [landmarks[145], landmarks[159]]
             for landmark in left:
                 x = int(landmark.x * frame_w)
                 y = int(landmark.y * frame_h)
                 cv2.circle(frame, (x, y), 3, (0, 255, 255))
             if (left[0].y - left[1].y) < 0.008:
-                pyautogui.click()
+                pyautogui.doubleClick()
+                pyautogui.sleep(1)
+            right = [landmarks[374], landmarks[386]]
+            for landmarks in right:
+                x = int(landmarks.x * frame_w)
+                y = int(landmarks.y * frame_h)
+                cv2.circle(frame, (x,y), 3, (0, 0, 255))
+            if(left[0].y - left[1].y < 0.006):
+                pyautogui.rightClick()
                 pyautogui.sleep(1)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
